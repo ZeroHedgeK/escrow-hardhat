@@ -29,7 +29,7 @@ function App() {
   async function newContract() {
     const beneficiary = document.getElementById('beneficiary').value;
     const arbiter = document.getElementById('arbiter').value;
-    const value = ethers.BigNumber.from(document.getElementById('wei').value);
+    const value = ethers.BigNumber.from(ethers.utils.parseEther(document.getElementById('ether').value));
     const escrowContract = await deploy(signer, arbiter, beneficiary, value);
 
 
@@ -43,15 +43,35 @@ function App() {
           document.getElementById(escrowContract.address).className =
             'complete';
           document.getElementById(escrowContract.address).innerText =
-            "✓ It's been approved!";
+            `✓ It's been approved!\n${escrowContract.address}`;
         });
-
+        
         await approve(escrowContract, signer);
+
+        await fetch('http://localhost:3001/escrows', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(escrow),
+        });
       },
     };
 
     setEscrows([...escrows, escrow]);
-  }
+  };
+
+  useEffect(() => {
+    async function fetchEscrows() {
+      const response = await fetch('http://localhost:3001/escrows');
+      const data = await response.json();
+      console.log(data);
+      setEscrows(data);
+    }
+  
+    fetchEscrows();
+  }, []);
+  
 
   return (
     <>
@@ -68,8 +88,8 @@ function App() {
         </label>
 
         <label>
-          Deposit Amount (in Wei)
-          <input type="text" id="wei" />
+          Deposit Amount (in Ether)
+          <input type="text" id="ether" />
         </label>
 
         <div

@@ -1,0 +1,32 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Escrow Contracts</title>
+</head>
+<body>
+  <h1>Escrow Contracts</h1>
+  <ul id="escrow-list"></ul>
+</body>
+<script>
+  const escrowList = document.getElementById('escrow-list');
+
+  // Function to fetch and display escrows
+  async function fetchEscrows() {
+    escrowList.innerHTML = '';
+
+    const response = await fetch('/escrows');
+    const escrows = await response.json();
+
+    escrows.forEach(escrow => {
+      const li = document.createElement('li');
+      li.textContent = escrow.address;
+      escrowList.appendChild(li);
+    });
+  }
+
+  fetchEscrows(); // Initial fetch
+
+  // Polling to update escrow list every 5 seconds
+  setInterval(fetchEscrows, 5000);
+</script>
+</html>
